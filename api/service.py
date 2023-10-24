@@ -1,5 +1,17 @@
 from deepface import DeepFace
+import base64
+import os, tempfile
 
+def writeImage(img_base64):
+    tmpfl = tempfile.NamedTemporaryFile(delete=False)
+    try:
+        if img_base64[0:4]=="data":
+            img_base64 = img_base64.split(",")[1]
+            
+        tmpfl.write(base64.b64decode(img_base64))
+        return tmpfl.name
+    finally:
+        tmpfl.close()
 
 def represent(img_path, model_name, detector_backend, enforce_detection, align):
     result = {}

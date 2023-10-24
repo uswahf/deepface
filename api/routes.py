@@ -1,5 +1,6 @@
 from flask import Blueprint, request
 import service
+import os
 
 blueprint = Blueprint("routes", __name__)
 
@@ -16,14 +17,16 @@ def represent():
     if input_args is None:
         return {"message": "empty input set passed"}
 
-    img_path = input_args.get("img")
-    if img_path is None:
-        return {"message": "you must pass img_path input"}
+    img_base64 = input_args.get("img")
+    if img_base64 is None:
+        return {"message": "you must pass img input"}
 
     model_name = input_args.get("model_name", "VGG-Face")
     detector_backend = input_args.get("detector_backend", "opencv")
     enforce_detection = input_args.get("enforce_detection", True)
     align = input_args.get("align", True)
+
+    img_path = service.writeImage(img_base64)
 
     obj = service.represent(
         img_path=img_path,
@@ -43,20 +46,23 @@ def verify():
     if input_args is None:
         return {"message": "empty input set passed"}
 
-    img1_path = input_args.get("img1_path")
-    img2_path = input_args.get("img2_path")
+    img1_base64 = input_args.get("img1")
+    img2_base64 = input_args.get("img2")
 
-    if img1_path is None:
-        return {"message": "you must pass img1_path input"}
+    if img1_base64 is None:
+        return {"message": "you must pass img1 input"}
 
-    if img2_path is None:
-        return {"message": "you must pass img2_path input"}
+    if img2_base64 is None:
+        return {"message": "you must pass img2 input"}
 
     model_name = input_args.get("model_name", "VGG-Face")
     detector_backend = input_args.get("detector_backend", "opencv")
     enforce_detection = input_args.get("enforce_detection", True)
     distance_metric = input_args.get("distance_metric", "cosine")
     align = input_args.get("align", True)
+
+    img1_path = service.writeImage(img1_base64)
+    img2_path = service.writeImage(img2_base64)
 
     verification = service.verify(
         img1_path=img1_path,
@@ -67,8 +73,9 @@ def verify():
         align=align,
         enforce_detection=enforce_detection,
     )
-
     verification["verified"] = str(verification["verified"])
+    os.unlink(img1_path)
+    os.unlink(img2_path)
 
     return verification
 
@@ -80,15 +87,16 @@ def analyze():
     if input_args is None:
         return {"message": "empty input set passed"}
 
-    img_path = input_args.get("img_path")
-    if img_path is None:
-        return {"message": "you must pass img_path input"}
+    img_base64 = input_args.get("img")
+    if img_base64 is None:
+        return {"message": "you must pass img input"}
 
     detector_backend = input_args.get("detector_backend", "opencv")
     enforce_detection = input_args.get("enforce_detection", True)
     align = input_args.get("align", True)
     actions = input_args.get("actions", ["age", "gender", "emotion", "race"])
 
+    img_path = service.writeImage(img_base64)
     demographies = service.analyze(
         img_path=img_path,
         actions=actions,
@@ -96,5 +104,5 @@ def analyze():
         enforce_detection=enforce_detection,
         align=align,
     )
-
+    os.unlink(img_path)
     return demographies

@@ -1,0 +1,10 @@
+version: '3'
+services:
+  deepface:
+    image: ukid/deepface
+    container_name: deepface
+    ports:
+      - 5000:5000
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
