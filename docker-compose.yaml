@@ -1,7 +1,7 @@
 version: '3'
 services:
   deepface:
-    image: ukid/deepface
+    image: wahf/deepface:latest
     container_name: deepface
     ports:
       - 5000:5000

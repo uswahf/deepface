@@ -1,6 +1,7 @@
 from deepface import DeepFace
 import base64
 import os, tempfile
+import requests
 
 def writeImage(img_base64):
     tmpfl = tempfile.NamedTemporaryFile(delete=False)
@@ -12,6 +13,19 @@ def writeImage(img_base64):
         return tmpfl.name
     finally:
         tmpfl.close()
+
+def fetchImage(img_url):
+    response = requests.get(img_url)
+    # 检查请求是否成功
+    if response.status_code == 200:
+        # 获取图片数据
+        image_data = response.content
+
+        tmpfl = tempfile.NamedTemporaryFile(delete=False)
+        tmpfl.write(image_data)
+        tmpfl.close()
+        return tmpfl.name
+
 
 def represent(img_path, model_name, detector_backend, enforce_detection, align):
     result = {}

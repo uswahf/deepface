@@ -18,7 +18,8 @@ def represent():
         return {"message": "empty input set passed"}
 
     img_base64 = input_args.get("img")
-    if img_base64 is None:
+    img_url = input_args.get("img_url")
+    if img_base64 is None and img_url is None:
         return {"message": "you must pass img input"}
 
     model_name = input_args.get("model_name", "VGG-Face")
@@ -26,8 +27,12 @@ def represent():
     enforce_detection = input_args.get("enforce_detection", True)
     align = input_args.get("align", True)
 
-    img_path = service.writeImage(img_base64)
-
+    img_path = ""
+    if img_base64 is None:
+        img_path = service.fetchImage(img_url)
+    else:
+        img_path = service.writeImage(img_base64)
+    
     obj = service.represent(
         img_path=img_path,
         model_name=model_name,
@@ -35,7 +40,6 @@ def represent():
         enforce_detection=enforce_detection,
         align=align,
     )
-
     return obj
 
 
@@ -47,12 +51,14 @@ def verify():
         return {"message": "empty input set passed"}
 
     img1_base64 = input_args.get("img1")
+    img1_url = input_args.get("img1_url")
     img2_base64 = input_args.get("img2")
+    img2_url = input_args.get("img2_url")
 
-    if img1_base64 is None:
+    if img1_base64 is None and img1_url is None:
         return {"message": "you must pass img1 input"}
 
-    if img2_base64 is None:
+    if img2_base64 is None and img2_url is None:
         return {"message": "you must pass img2 input"}
 
     model_name = input_args.get("model_name", "VGG-Face")
@@ -61,8 +67,16 @@ def verify():
     distance_metric = input_args.get("distance_metric", "cosine")
     align = input_args.get("align", True)
 
-    img1_path = service.writeImage(img1_base64)
-    img2_path = service.writeImage(img2_base64)
+    img1_path = ""
+    if img1_base64 is None:
+        img1_path = service.fetchImage(img1_url)
+    else:
+        img1_path = service.writeImage(img1_base64)
+    img2_path = ""
+    if img2_base64 is None:
+        img2_path = service.fetchImage(img2_url)
+    else:
+        img2_path = service.writeImage(img2_base64)
 
     verification = service.verify(
         img1_path=img1_path,
@@ -88,7 +102,8 @@ def analyze():
         return {"message": "empty input set passed"}
 
     img_base64 = input_args.get("img")
-    if img_base64 is None:
+    img_url = input_args.get("img_url")
+    if img_base64 is None and img_url is None:
         return {"message": "you must pass img input"}
 
     detector_backend = input_args.get("detector_backend", "opencv")
@@ -96,7 +111,12 @@ def analyze():
     align = input_args.get("align", True)
     actions = input_args.get("actions", ["age", "gender", "emotion", "race"])
 
-    img_path = service.writeImage(img_base64)
+    img_path = ""
+    if img_base64 is None:
+        img_path = service.fetchImage(img_url)
+    else:
+        img_path = service.writeImage(img_base64)
+
     demographies = service.analyze(
         img_path=img_path,
         actions=actions,
